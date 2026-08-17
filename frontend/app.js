@@ -1,6 +1,7 @@
 const form = document.getElementById('task-form');
 const titleInput = document.getElementById('title');
 const descriptionInput = document.getElementById('description');
+const dueDateInput = document.getElementById('due-date');
 const priorityInput = document.getElementById('priority');
 const list = document.getElementById('task-list');
 const searchInput = document.getElementById('search');
@@ -54,11 +55,23 @@ function renderTasks(tasks) {
     saveNotesBtn.className = 'btn-secondary';
     saveNotesBtn.addEventListener('click', () => saveNotes(task.id, notesArea.value));
 
+    const dueDateField = document.createElement('input');
+    dueDateField.type = 'date';
+    dueDateField.className = 'due-date-input';
+    dueDateField.value = task.due_date || '';
+
+    const saveDueDateBtn = document.createElement('button');
+    saveDueDateBtn.textContent = 'Save Due Date';
+    saveDueDateBtn.className = 'btn-secondary';
+    saveDueDateBtn.addEventListener('click', () => saveDueDate(task.id, dueDateField.value));
+
     li.appendChild(span);
     li.appendChild(prioritySpan);
     li.appendChild(deleteBtn);
     li.appendChild(notesArea);
     li.appendChild(saveNotesBtn);
+    li.appendChild(dueDateField);
+    li.appendChild(saveDueDateBtn);
     list.appendChild(li);
   });
 }
@@ -86,6 +99,15 @@ async function saveNotes(id, notes) {
   fetchTasks();
 }
 
+async function saveDueDate(id, dueDate) {
+  await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ due_date: dueDate || null }),
+  });
+  fetchTasks();
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   await fetch('/api/tasks', {
@@ -94,11 +116,13 @@ form.addEventListener('submit', async (e) => {
     body: JSON.stringify({
       title: titleInput.value,
       description: descriptionInput.value,
+      due_date: dueDateInput.value || null,
       priority: priorityInput.value,
     }),
   });
   titleInput.value = '';
   descriptionInput.value = '';
+  dueDateInput.value = '';
   priorityInput.value = 'medium';
   fetchTasks();
 });

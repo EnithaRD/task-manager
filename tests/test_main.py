@@ -62,6 +62,21 @@ def test_create_task_with_notes():
     assert response.json()["notes"] == "Remember passport"
 
 
+def test_create_task_default_due_date():
+    response = client.post("/api/tasks", json={"title": "Buy milk"})
+    assert response.status_code == 201
+    assert response.json()["due_date"] is None
+
+
+def test_create_task_with_due_date():
+    response = client.post(
+        "/api/tasks",
+        json={"title": "Plan trip", "due_date": "2026-09-01"},
+    )
+    assert response.status_code == 201
+    assert response.json()["due_date"] == "2026-09-01"
+
+
 def test_get_task():
     created = client.post("/api/tasks", json={"title": "Read book"}).json()
     response = client.get(f"/api/tasks/{created['id']}")
@@ -138,6 +153,42 @@ def test_update_task_notes_to_empty_string_clears_it():
     response = client.put(f"/api/tasks/{created['id']}", json={"notes": ""})
     assert response.status_code == 200
     assert response.json()["notes"] == ""
+
+
+def test_update_task_due_date():
+    created = client.post("/api/tasks", json={"title": "Old title"}).json()
+    response = client.put(
+        f"/api/tasks/{created['id']}", json={"due_date": "2026-10-15"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["due_date"] == "2026-10-15"
+    assert data["title"] == "Old title"
+
+
+def test_update_task_due_date_does_not_affect_other_fields():
+    created = client.post(
+        "/api/tasks",
+        json={"title": "Task", "description": "Desc", "priority": "high"},
+    ).json()
+    response = client.put(
+        f"/api/tasks/{created['id']}", json={"due_date": "2026-11-01"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["due_date"] == "2026-11-01"
+    assert data["description"] == "Desc"
+    assert data["priority"] == "high"
+    assert data["completed"] is False
+
+
+def test_update_task_due_date_to_null_clears_it():
+    created = client.post(
+        "/api/tasks", json={"title": "Task", "due_date": "2026-09-01"}
+    ).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"due_date": None})
+    assert response.status_code == 200
+    assert response.json()["due_date"] is None
 
 
 def test_update_task_not_found():

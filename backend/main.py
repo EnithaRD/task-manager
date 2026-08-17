@@ -15,6 +15,7 @@ class TaskCreate(BaseModel):
     notes: str = ""
     completed: bool = False
     priority: Priority = "medium"
+    due_date: str | None = None
 
 
 class TaskUpdate(BaseModel):
@@ -23,6 +24,7 @@ class TaskUpdate(BaseModel):
     notes: str | None = None
     completed: bool | None = None
     priority: Priority | None = None
+    due_date: str | None = None
 
 
 class Task(TaskCreate):
