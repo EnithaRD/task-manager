@@ -158,4 +158,21 @@ Identify any files or changes that were not planned.
 Do not make any changes.
 ```
 
+## 8. Ask for Clarification
+
+**Template**
+
+```text
+Before implementing [FEATURE], identify any ambiguous or missing requirements.
+Ask me the necessary questions before making changes.
+Do not make assumptions about unclear requirements.
+```
+
+**Example**
+
+```text
+Before implementing the Task Manager status workflow, identify any unclear requirements about the allowed statuses and transitions.
+Ask for clarification before making changes.
+```
+
 
