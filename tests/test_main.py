@@ -47,11 +47,35 @@ def test_create_task_invalid_priority():
     assert response.status_code == 422
 
 
+def test_create_task_default_notes():
+    response = client.post("/api/tasks", json={"title": "Buy milk"})
+    assert response.status_code == 201
+    assert response.json()["notes"] == ""
+
+
+def test_create_task_with_notes():
+    response = client.post(
+        "/api/tasks",
+        json={"title": "Plan trip", "notes": "Remember passport"},
+    )
+    assert response.status_code == 201
+    assert response.json()["notes"] == "Remember passport"
+
+
 def test_get_task():
     created = client.post("/api/tasks", json={"title": "Read book"}).json()
     response = client.get(f"/api/tasks/{created['id']}")
     assert response.status_code == 200
     assert response.json()["title"] == "Read book"
+
+
+def test_get_task_includes_notes():
+    created = client.post(
+        "/api/tasks", json={"title": "Read book", "notes": "Chapter 3"}
+    ).json()
+    response = client.get(f"/api/tasks/{created['id']}")
+    assert response.status_code == 200
+    assert response.json()["notes"] == "Chapter 3"
 
 
 def test_get_task_not_found():
@@ -73,6 +97,47 @@ def test_update_task_priority():
     response = client.put(f"/api/tasks/{created['id']}", json={"priority": "low"})
     assert response.status_code == 200
     assert response.json()["priority"] == "low"
+
+
+def test_update_task_notes():
+    created = client.post("/api/tasks", json={"title": "Old title"}).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"notes": "New note"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["notes"] == "New note"
+    assert data["title"] == "Old title"
+
+
+def test_update_task_notes_does_not_affect_other_fields():
+    created = client.post(
+        "/api/tasks",
+        json={"title": "Task", "description": "Desc", "priority": "high"},
+    ).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"notes": "A note"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["notes"] == "A note"
+    assert data["description"] == "Desc"
+    assert data["priority"] == "high"
+    assert data["completed"] is False
+
+
+def test_update_other_fields_does_not_affect_notes():
+    created = client.post(
+        "/api/tasks", json={"title": "Task", "notes": "Keep me"}
+    ).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"completed": True})
+    assert response.status_code == 200
+    assert response.json()["notes"] == "Keep me"
+
+
+def test_update_task_notes_to_empty_string_clears_it():
+    created = client.post(
+        "/api/tasks", json={"title": "Task", "notes": "Something"}
+    ).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"notes": ""})
+    assert response.status_code == 200
+    assert response.json()["notes"] == ""
 
 
 def test_update_task_not_found():
@@ -112,6 +177,13 @@ def test_search_case_insensitive_match():
 
 def test_search_no_match_returns_empty():
     client.post("/api/tasks", json={"title": "Buy Milk"})
+    response = client.get("/api/tasks", params={"search": "xyz"})
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_search_ignores_notes_field():
+    client.post("/api/tasks", json={"title": "Buy Milk", "notes": "xyz special note"})
     response = client.get("/api/tasks", params={"search": "xyz"})
     assert response.status_code == 200
     assert response.json() == []

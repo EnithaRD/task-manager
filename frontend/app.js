@@ -42,11 +42,23 @@ function renderTasks(tasks) {
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
+    deleteBtn.className = 'btn-delete';
     deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+    const notesArea = document.createElement('textarea');
+    notesArea.className = 'notes-textarea';
+    notesArea.value = task.notes;
+
+    const saveNotesBtn = document.createElement('button');
+    saveNotesBtn.textContent = 'Save Notes';
+    saveNotesBtn.className = 'btn-secondary';
+    saveNotesBtn.addEventListener('click', () => saveNotes(task.id, notesArea.value));
 
     li.appendChild(span);
     li.appendChild(prioritySpan);
     li.appendChild(deleteBtn);
+    li.appendChild(notesArea);
+    li.appendChild(saveNotesBtn);
     list.appendChild(li);
   });
 }
@@ -62,6 +74,15 @@ async function toggleTask(task) {
 
 async function deleteTask(id) {
   await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+  fetchTasks();
+}
+
+async function saveNotes(id, notes) {
+  await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes }),
+  });
   fetchTasks();
 }
 

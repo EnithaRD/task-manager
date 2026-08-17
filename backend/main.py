@@ -12,6 +12,7 @@ Priority = Literal["low", "medium", "high"]
 class TaskCreate(BaseModel):
     title: str
     description: str = ""
+    notes: str = ""
     completed: bool = False
     priority: Priority = "medium"
 
@@ -19,6 +20,7 @@ class TaskCreate(BaseModel):
 class TaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
+    notes: str | None = None
     completed: bool | None = None
     priority: Priority | None = None
 
