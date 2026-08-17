@@ -11,8 +11,36 @@
   <form id="task-form">
     <input type="text" id="title" placeholder="Task title" required />
     <input type="text" id="description" placeholder="Description" />
+    <select id="priority">
+      <option value="low">Low</option>
+      <option value="medium" selected>Medium</option>
+      <option value="high">High</option>
+    </select>
     <button type="submit">Add Task</button>
   </form>
+
+  <div id="task-controls">
+    <input type="text" id="search" placeholder="Search by title" />
+    <select id="filter-completed">
+      <option value="">All</option>
+      <option value="false">Active</option>
+      <option value="true">Completed</option>
+    </select>
+    <select id="filter-priority">
+      <option value="">All priorities</option>
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+    <select id="sort-by">
+      <option value="">Creation order</option>
+      <option value="title">Title</option>
+    </select>
+    <select id="sort-order">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+  </div>
 
   <ul id="task-list"></ul>
 

@@ -2,20 +2,25 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pathlib import Path
+from typing import Literal
 
 app = FastAPI(title="Task Manager API")
+
+Priority = Literal["low", "medium", "high"]
 
 
 class TaskCreate(BaseModel):
     title: str
     description: str = ""
     completed: bool = False
+    priority: Priority = "medium"
 
 
 class TaskUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     completed: bool | None = None
+    priority: Priority | None = None
 
 
 class Task(TaskCreate):
@@ -27,8 +32,30 @@ next_id = 1
 
 
 @app.get("/api/tasks", response_model=list[Task])
-def list_tasks():
-    return list(tasks.values())
+def list_tasks(
+    search: str | None = None,
+    completed: bool | None = None,
+    priority: Priority | None = None,
+    sort_by: Literal["title", "created"] | None = None,
+    order: Literal["asc", "desc"] = "asc",
+):
+    result = list(tasks.values())
+
+    if search is not None:
+        result = [task for task in result if search.lower() in task.title.lower()]
+
+    if completed is not None:
+        result = [task for task in result if task.completed == completed]
+
+    if priority is not None:
+        result = [task for task in result if task.priority == priority]
+
+    if sort_by == "title":
+        result.sort(key=lambda task: task.title.lower(), reverse=order == "desc")
+    elif sort_by == "created":
+        result.sort(key=lambda task: task.id, reverse=order == "desc")
+
+    return result
 
 
 @app.post("/api/tasks", response_model=Task, status_code=201)

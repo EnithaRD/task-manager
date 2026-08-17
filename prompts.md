@@ -1,0 +1,1 @@
+The biggest improvement came from adding clear context, requirements, constraints, and acceptance criteria in B. This helped Claude understand the existing code and avoid unnecessary changes. C became more precise by referencing existing files and adding explicit “must not” rules, but it was not significantly better than B. The examples added only a small improvement.

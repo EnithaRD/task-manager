@@ -18,7 +18,8 @@ h1 {
   margin-bottom: 16px;
 }
 
-#task-form input {
+#task-form input,
+#task-form select {
   flex: 1;
   padding: 8px;
   border: 1px solid #ccc;
@@ -26,7 +27,8 @@ h1 {
   font-size: 14px;
 }
 
-#task-form input:focus {
+#task-form input:focus,
+#task-form select:focus {
   outline: none;
   border-color: #4a90d9;
 }
@@ -43,6 +45,27 @@ h1 {
 
 #task-form button:hover {
   background: #3a7bc0;
+}
+
+#task-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#task-controls input,
+#task-controls select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+#task-controls input:focus,
+#task-controls select:focus {
+  outline: none;
+  border-color: #4a90d9;
 }
 
 #task-list {
@@ -64,6 +87,23 @@ h1 {
 
 #task-list li span.title {
   cursor: pointer;
+}
+
+#task-list li span.priority {
+  font-size: 12px;
+  margin: 0 8px;
+}
+
+#task-list li span.priority-low {
+  color: #4a90d9;
+}
+
+#task-list li span.priority-medium {
+  color: #d9a94a;
+}
+
+#task-list li span.priority-high {
+  color: #e05555;
 }
 
 #task-list li.completed span.title {
