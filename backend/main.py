@@ -7,6 +7,7 @@ from typing import Literal
 app = FastAPI(title="Task Manager API")
 
 Priority = Literal["low", "medium", "high"]
+Category = Literal["Work", "Study", "Personal", "Shopping", "Other"]
 
 
 class TaskCreate(BaseModel):
@@ -16,6 +17,7 @@ class TaskCreate(BaseModel):
     completed: bool = False
     priority: Priority = "medium"
     due_date: str | None = None
+    category: Category = "Other"
 
 
 class TaskUpdate(BaseModel):
@@ -25,6 +27,7 @@ class TaskUpdate(BaseModel):
     completed: bool | None = None
     priority: Priority | None = None
     due_date: str | None = None
+    category: Category | None = None
 
 
 class Task(TaskCreate):

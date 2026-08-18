@@ -77,6 +77,29 @@ def test_create_task_with_due_date():
     assert response.json()["due_date"] == "2026-09-01"
 
 
+def test_create_task_default_category():
+    response = client.post("/api/tasks", json={"title": "Buy milk"})
+    assert response.status_code == 201
+    assert response.json()["category"] == "Other"
+
+
+def test_create_task_with_category():
+    response = client.post(
+        "/api/tasks",
+        json={"title": "Finish report", "category": "Work"},
+    )
+    assert response.status_code == 201
+    assert response.json()["category"] == "Work"
+
+
+def test_create_task_invalid_category():
+    response = client.post(
+        "/api/tasks",
+        json={"title": "Bad category", "category": "Urgent"},
+    )
+    assert response.status_code == 422
+
+
 def test_get_task():
     created = client.post("/api/tasks", json={"title": "Read book"}).json()
     response = client.get(f"/api/tasks/{created['id']}")
@@ -91,6 +114,15 @@ def test_get_task_includes_notes():
     response = client.get(f"/api/tasks/{created['id']}")
     assert response.status_code == 200
     assert response.json()["notes"] == "Chapter 3"
+
+
+def test_get_task_includes_category():
+    created = client.post(
+        "/api/tasks", json={"title": "Read book", "category": "Study"}
+    ).json()
+    response = client.get(f"/api/tasks/{created['id']}")
+    assert response.status_code == 200
+    assert response.json()["category"] == "Study"
 
 
 def test_get_task_not_found():
@@ -189,6 +221,35 @@ def test_update_task_due_date_to_null_clears_it():
     response = client.put(f"/api/tasks/{created['id']}", json={"due_date": None})
     assert response.status_code == 200
     assert response.json()["due_date"] is None
+
+
+def test_update_task_category():
+    created = client.post("/api/tasks", json={"title": "Old title"}).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"category": "Personal"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["category"] == "Personal"
+    assert data["title"] == "Old title"
+
+
+def test_update_task_category_does_not_affect_other_fields():
+    created = client.post(
+        "/api/tasks",
+        json={"title": "Task", "description": "Desc", "priority": "high"},
+    ).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"category": "Shopping"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["category"] == "Shopping"
+    assert data["description"] == "Desc"
+    assert data["priority"] == "high"
+    assert data["completed"] is False
+
+
+def test_update_task_invalid_category():
+    created = client.post("/api/tasks", json={"title": "Old title"}).json()
+    response = client.put(f"/api/tasks/{created['id']}", json={"category": "Nope"})
+    assert response.status_code == 422
 
 
 def test_update_task_not_found():
