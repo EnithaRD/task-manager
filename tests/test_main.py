@@ -337,6 +337,51 @@ def test_combined_search_and_completed_filter():
     assert titles == ["Buy Milk"]
 
 
+def test_filter_by_category():
+    client.post("/api/tasks", json={"title": "Study task", "category": "Study"})
+    client.post("/api/tasks", json={"title": "Work task", "category": "Work"})
+    response = client.get("/api/tasks", params={"category": "Study"})
+    assert response.status_code == 200
+    titles = [task["title"] for task in response.json()]
+    assert titles == ["Study task"]
+
+
+def test_filter_by_category_no_match_returns_empty():
+    client.post("/api/tasks", json={"title": "Work task", "category": "Work"})
+    response = client.get("/api/tasks", params={"category": "Shopping"})
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_filter_by_invalid_category_returns_422():
+    response = client.get("/api/tasks", params={"category": "Nope"})
+    assert response.status_code == 422
+
+
+def test_combined_category_and_completed_filter():
+    work_done = client.post(
+        "/api/tasks", json={"title": "Finish slides", "category": "Work"}
+    ).json()
+    shopping_done = client.post(
+        "/api/tasks", json={"title": "Buy milk", "category": "Shopping"}
+    ).json()
+    client.post("/api/tasks", json={"title": "Plan meeting", "category": "Work"})
+    client.put(f"/api/tasks/{work_done['id']}", json={"completed": True})
+    client.put(f"/api/tasks/{shopping_done['id']}", json={"completed": True})
+
+    completed_response = client.get("/api/tasks", params={"completed": "true"})
+    assert completed_response.status_code == 200
+    completed_titles = [task["title"] for task in completed_response.json()]
+    assert len(completed_titles) > 1
+
+    response = client.get(
+        "/api/tasks", params={"category": "Work", "completed": "true"}
+    )
+    assert response.status_code == 200
+    titles = [task["title"] for task in response.json()]
+    assert titles == ["Finish slides"]
+
+
 def test_sort_by_title_ascending():
     client.post("/api/tasks", json={"title": "Banana"})
     client.post("/api/tasks", json={"title": "Apple"})
