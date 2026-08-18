@@ -65,3 +65,18 @@ I split the request into four independently reviewable and mergeable steps:
 Each step has a clear scope and can be reviewed and merged independently. The "AND" test was used to avoid combining multiple responsibilities into one step.
 
 I did not implement the full oversized request because the purpose of this exercise was to practice recognizing when a request should be split before implementation.
+
+
+## Exercise 7.4 — Reflection
+
+### What was missing from my original Slice 2 prompt?
+
+My original prompt did not include an explicit binding constraint specifying which files Claude was allowed to modify.
+
+I only asked Claude to keep the implementation consistent with the existing codebase. Although Claude modified only `backend/main.py` and `tests/test_main.py` in this case, the prompt did not explicitly prevent changes to other files.
+
+In Slice 1, I had explicitly stated the allowed files. I should have carried that constraint into Slice 2 as well.
+
+### Lesson
+
+When scope matters, do not rely on the agent to infer it. Explicitly name the files that may be changed and state that files outside that list must not be modified.

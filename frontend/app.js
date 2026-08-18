@@ -3,10 +3,12 @@ const titleInput = document.getElementById('title');
 const descriptionInput = document.getElementById('description');
 const dueDateInput = document.getElementById('due-date');
 const priorityInput = document.getElementById('priority');
+const categoryInput = document.getElementById('category');
 const list = document.getElementById('task-list');
 const searchInput = document.getElementById('search');
 const filterCompletedSelect = document.getElementById('filter-completed');
 const filterPrioritySelect = document.getElementById('filter-priority');
+const filterCategorySelect = document.getElementById('filter-category');
 const sortBySelect = document.getElementById('sort-by');
 const sortOrderSelect = document.getElementById('sort-order');
 
@@ -15,6 +17,7 @@ async function fetchTasks() {
   if (searchInput.value) params.set('search', searchInput.value);
   if (filterCompletedSelect.value) params.set('completed', filterCompletedSelect.value);
   if (filterPrioritySelect.value) params.set('priority', filterPrioritySelect.value);
+  if (filterCategorySelect.value) params.set('category', filterCategorySelect.value);
   if (sortBySelect.value) {
     params.set('sort_by', sortBySelect.value);
     params.set('order', sortOrderSelect.value);
@@ -40,6 +43,10 @@ function renderTasks(tasks) {
     const prioritySpan = document.createElement('span');
     prioritySpan.className = `priority priority-${task.priority}`;
     prioritySpan.textContent = task.priority;
+
+    const categorySpan = document.createElement('span');
+    categorySpan.className = 'category';
+    categorySpan.textContent = task.category;
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
@@ -67,6 +74,7 @@ function renderTasks(tasks) {
 
     li.appendChild(span);
     li.appendChild(prioritySpan);
+    li.appendChild(categorySpan);
     li.appendChild(deleteBtn);
     li.appendChild(notesArea);
     li.appendChild(saveNotesBtn);
@@ -118,18 +126,21 @@ form.addEventListener('submit', async (e) => {
       description: descriptionInput.value,
       due_date: dueDateInput.value || null,
       priority: priorityInput.value,
+      category: categoryInput.value,
     }),
   });
   titleInput.value = '';
   descriptionInput.value = '';
   dueDateInput.value = '';
   priorityInput.value = 'medium';
+  categoryInput.value = 'Other';
   fetchTasks();
 });
 
 searchInput.addEventListener('input', fetchTasks);
 filterCompletedSelect.addEventListener('change', fetchTasks);
 filterPrioritySelect.addEventListener('change', fetchTasks);
+filterCategorySelect.addEventListener('change', fetchTasks);
 sortBySelect.addEventListener('change', fetchTasks);
 sortOrderSelect.addEventListener('change', fetchTasks);
 
