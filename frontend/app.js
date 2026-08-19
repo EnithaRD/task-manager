@@ -37,9 +37,24 @@ function renderTasks(tasks) {
     span.textContent = task.title;
     span.addEventListener('click', () => toggleTask(task));
 
-    const prioritySpan = document.createElement('span');
-    prioritySpan.className = `priority priority-${task.priority}`;
-    prioritySpan.textContent = task.priority;
+    const priorityBadge = document.createElement('span');
+    priorityBadge.className = `priority priority-${task.priority}`;
+    priorityBadge.textContent = task.priority;
+
+    const prioritySelect = document.createElement('select');
+    prioritySelect.className = 'priority-select';
+    ['low', 'medium', 'high'].forEach((value) => {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = value;
+      if (value === task.priority) option.selected = true;
+      prioritySelect.appendChild(option);
+    });
+
+    const savePriorityBtn = document.createElement('button');
+    savePriorityBtn.textContent = 'Save Priority';
+    savePriorityBtn.className = 'btn-secondary';
+    savePriorityBtn.addEventListener('click', () => savePriority(task.id, prioritySelect.value));
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
@@ -66,12 +81,14 @@ function renderTasks(tasks) {
     saveDueDateBtn.addEventListener('click', () => saveDueDate(task.id, dueDateField.value));
 
     li.appendChild(span);
-    li.appendChild(prioritySpan);
+    li.appendChild(priorityBadge);
     li.appendChild(deleteBtn);
     li.appendChild(notesArea);
     li.appendChild(saveNotesBtn);
     li.appendChild(dueDateField);
     li.appendChild(saveDueDateBtn);
+    li.appendChild(prioritySelect);
+    li.appendChild(savePriorityBtn);
     list.appendChild(li);
   });
 }
@@ -104,6 +121,15 @@ async function saveDueDate(id, dueDate) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ due_date: dueDate || null }),
+  });
+  fetchTasks();
+}
+
+async function savePriority(id, priority) {
+  await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ priority }),
   });
   fetchTasks();
 }
