@@ -24,7 +24,7 @@ async function fetchTasks() {
   }
 
   const query = params.toString();
-  const res = await fetch(query ? `/api/tasks?${query}` : '/api/tasks');
+  const res = await fetch(query ? `/tasks?${query}` : '/tasks');
   const tasks = await res.json();
   renderTasks(tasks);
 }
@@ -85,7 +85,7 @@ function renderTasks(tasks) {
 }
 
 async function toggleTask(task) {
-  await fetch(`/api/tasks/${task.id}`, {
+  await fetch(`/tasks/${task.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ completed: !task.completed }),
@@ -94,12 +94,12 @@ async function toggleTask(task) {
 }
 
 async function deleteTask(id) {
-  await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+  await fetch(`/tasks/${id}`, { method: 'DELETE' });
   fetchTasks();
 }
 
 async function saveNotes(id, notes) {
-  await fetch(`/api/tasks/${id}`, {
+  await fetch(`/tasks/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ notes }),
@@ -108,7 +108,7 @@ async function saveNotes(id, notes) {
 }
 
 async function saveDueDate(id, dueDate) {
-  await fetch(`/api/tasks/${id}`, {
+  await fetch(`/tasks/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ due_date: dueDate || null }),
@@ -118,7 +118,7 @@ async function saveDueDate(id, dueDate) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  await fetch('/api/tasks', {
+  await fetch('/tasks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
